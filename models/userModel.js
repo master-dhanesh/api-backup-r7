@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
 const userModel = new Schema({
     username: {
@@ -11,6 +12,7 @@ const userModel = new Schema({
     },
     password: {
         type: String,
+        select: false,
         required: [true, "Passsword is required"],
         minlength: [6, "Password required at least 6 characters"],
     },
@@ -20,6 +22,14 @@ const userModel = new Schema({
         validate: [validator.isEmail, "Invalid email"],
     },
 });
+
+userModel.pre("save", async function () {
+    this.password = await bcrypt.hash(this.password, 10);
+});
+
+userModel.methods.comparePassword = async function (userPassword) {
+    return await bcrypt.compare(userPassword, this.password);
+};
 
 const User = model("user", userModel);
 
