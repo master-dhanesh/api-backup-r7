@@ -21,6 +21,13 @@ const userModel = new Schema({
         required: [true, "Email is required"],
         validate: [validator.isEmail, "Invalid email"],
     },
+    image: {
+        type: Object,
+        default: {
+            public_id: "",
+            url: "",
+        },
+    },
 });
 
 userModel.pre("save", async function () {
