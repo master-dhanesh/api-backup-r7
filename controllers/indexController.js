@@ -51,31 +51,33 @@ exports.signin = async (req, res, next) => {
 };
 
 exports.logout = (req, res, next) => {
-    req.clearCookie();
+    res.clearCookie("token");
     res.status(200).json({ message: "user logged out" });
 };
 
 exports.upload = async (req, res, next) => {
-    const form = formidable();
-    form.parse(req, async (err, fields, files) => {
-        if (err) throw err;
-
-        const user = await User.findById(req.params.id).exec();
-        if (files) {
-            const { public_id, secure_url } =
-                await cloudinary.v2.uploader.upload(files.image.filepath, {
-                    folder: "r7",
-                    width: 1920,
-                    crop: "scale",
-                    quality: "30",
-                });
-            user.image = {
-                public_id,
-                url: secure_url,
-            };
-        }
-        console.log(user);
-        await user.save();
-        res.status(200).json({ message: "image uploaded" });
-    });
+    try {
+        const form = formidable();
+        form.parse(req, async (err, fields, files) => {
+            if (err) throw err;
+            const user = await User.findById(req.params.id).exec();
+            if (files) {
+                const { public_id, secure_url } =
+                    await cloudinary.v2.uploader.upload(files.image.filepath, {
+                        folder: "r7",
+                        width: 1920,
+                        crop: "scale",
+                    });
+                user.image = { public_id, url: secure_url };
+            }
+            await User.findByIdAndUpdate(
+                req.params.id,
+                { $set: user },
+                { new: true }
+            ).exec();
+            res.status(200).json({ message: "Image Uploaded" });
+        });
+    } catch (err) {
+        res.send(err);
+    }
 };

@@ -18,8 +18,8 @@ router.post("/signup", signup);
 /**@api POST / signin */
 router.post("/signin", signin);
 
-/**@api POST / logout */
-router.post("/logout", logout);
+/**@api GET / logout */
+router.get("/logout", logout);
 
 /**@api POST / upload/:id */
 router.post("/upload/:id", upload);
