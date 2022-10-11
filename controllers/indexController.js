@@ -11,7 +11,7 @@ cloudinary.config({
 });
 
 exports.homepage = (req, res, next) => {
-    console.log(req);
+    console.log(req.cookies.token);
     res.status(200).json({ message: "This is homepage", id: req.auth.id });
 };
 
